@@ -54,9 +54,21 @@ aws configure list-profiles
 ## Created s3 bucket and then uploaded files like this
 
 ```bash
-aws s3 rm s3://data-pipeline-atwal/input/account_data.csv
 aws s3 cp /Users/gurpreetatwal/spark-scala-learn/src/main/resources/account_data.csv s3://data-pipeline-atwal/input/account_data.csv
-aws s3 ls s3://data-pipeline-atwal/input/   
+aws s3 cp /Users/gurpreetatwal/spark-scala-learn/src/main/resources/address_data.csv s3://data-pipeline-atwal/input/address_data.csv
+aws s3 cp /Users/gurpreetatwal/spark-scala-learn/src/main/resources/customer_data.csv s3://data-pipeline-atwal/input/customer_data.csv
+```
+
+## List files
+
+```bash
+aws s3 ls s3://data-pipeline-atwal/input/ 
+```
+
+## Remove files
+
+```bash
+aws s3 rm s3://data-pipeline-atwal/input/account_data.csv
 ```
 
 ## Logout from AWS CLI
@@ -68,6 +80,10 @@ $ aws logout
 ## Open the project in terminal and download dependencies 
 
 ```bash
+cd spark-scala-learn 
+```
+
+```bash
 sbt update
 sbt clean package
 ```
@@ -76,10 +92,11 @@ sbt clean package
 
 ```bash
 spark-submit \
-  --class S3ReadTest \
+  --class Main \
   --master 'local[*]' \
   --packages org.apache.hadoop:hadoop-aws:3.3.4 \
   target/scala-2.12/sparkdatasetlearning_2.12-0.1.0.jar \
   data-pipeline-atwal \
   ap-southeast-2
   ```
+  **Note**: data-pipeline-atwal is bucket name

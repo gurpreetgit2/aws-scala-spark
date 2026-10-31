@@ -18,15 +18,24 @@ curl -fsSL https://awscli.amazonaws.com/v2/install.sh | sudo bash -s -- --system
 ```
 
 ## Login in aws cli
+
 ```bash
 aws login
-location: ap-southeast-2
 ```
 
-## Logout from AWS CLI
+## Run this in your terminal after successfully completing `aws login` so that your temporary AWS credentials become environment variables that Spark's S3A credential provider can read
 
 ```bash
-$ aws logout
+eval "$(aws configure export-credentials --profile default --format env)"
+```
+
+## Verify the environment variables
+
+```bash
+[ -n "$AWS_ACCESS_KEY_ID" ] && \
+[ -n "$AWS_SECRET_ACCESS_KEY" ] && \
+[ -n "$AWS_SESSION_TOKEN" ] && \
+echo "AWS temporary credentials are set"
 ```
 
 ## Get the caller identity
@@ -39,12 +48,55 @@ aws sts get-caller-identity
 
 ```bash
 aws configure list
+aws configure list-profiles
 ```
 
 ## Created s3 bucket and then uploaded files like this
 
 ```bash
-aws s3 rm s3://data-pipeline-atwal/input/account_data.csv
 aws s3 cp /Users/gurpreetatwal/spark-scala-learn/src/main/resources/account_data.csv s3://data-pipeline-atwal/input/account_data.csv
-aws s3 ls s3://data-pipeline-atwal/input/   
+aws s3 cp /Users/gurpreetatwal/spark-scala-learn/src/main/resources/address_data.csv s3://data-pipeline-atwal/input/address_data.csv
+aws s3 cp /Users/gurpreetatwal/spark-scala-learn/src/main/resources/customer_data.csv s3://data-pipeline-atwal/input/customer_data.csv
 ```
+
+## List files
+
+```bash
+aws s3 ls s3://data-pipeline-atwal/input/ 
+```
+
+## Remove files
+
+```bash
+aws s3 rm s3://data-pipeline-atwal/input/account_data.csv
+```
+
+## Logout from AWS CLI
+
+```bash
+$ aws logout
+```
+
+## Open the project in terminal and download dependencies 
+
+```bash
+cd spark-scala-learn 
+```
+
+```bash
+sbt update
+sbt clean package
+```
+
+## Execute the command to read and process s3 files
+
+```bash
+spark-submit \
+  --class Main \
+  --master 'local[*]' \
+  --packages org.apache.hadoop:hadoop-aws:3.3.4 \
+  target/scala-2.12/sparkdatasetlearning_2.12-0.1.0.jar \
+  data-pipeline-atwal \
+  ap-southeast-2
+  ```
+  **Note**: data-pipeline-atwal is bucket name
